@@ -202,6 +202,7 @@ $jobs = $list->fetchAll(PDO::FETCH_ASSOC);
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="theme-color" content="#0f172a">
+  <link rel="icon" href="img/jobtrackr.png">
   <title>JobTrackr — Candidaturas</title>
   <style>
     :root{
@@ -221,8 +222,17 @@ $jobs = $list->fetchAll(PDO::FETCH_ASSOC);
     header.hero{
       background:linear-gradient(135deg, rgba(37,99,235,.12), rgba(124,58,237,.12));
       border:1px solid rgba(255,255,255,.12); color:#e5e7eb;
-      border-radius:20px; padding:22px 20px; backdrop-filter: blur(8px);
+      border-radius:20px; padding:18px 20px; backdrop-filter: blur(8px);
       box-shadow: var(--shadow); position:relative; overflow:hidden;
+    }
+    /* BRAND (logo + título) */
+    .brand{display:flex; align-items:center; gap:14px}
+    .brand .logo{
+      width:auto; height:40px; max-width:180px; object-fit:contain;
+      filter: drop-shadow(0 2px 6px rgba(0,0,0,.25));
+    }
+    @media (min-width:680px){
+      .brand .logo{height:48px}
     }
     header.hero::after{
       content:""; position:absolute; inset:-2px; background:
@@ -230,7 +240,7 @@ $jobs = $list->fetchAll(PDO::FETCH_ASSOC);
       radial-gradient(500px 100px at 80% -10%, rgba(124,58,237,.18), transparent 60%);
       pointer-events:none;
     }
-    h1{margin:0 0 6px;font-size:32px;letter-spacing:.2px}
+    h1{margin:0 0 4px;font-size:28px;letter-spacing:.2px}
     .sub{color:#cbd5e1;margin:0}
     .grid{display:grid;grid-template-columns:1fr 1fr;gap:22px;margin-top:20px}
     .card{
@@ -294,22 +304,18 @@ $jobs = $list->fetchAll(PDO::FETCH_ASSOC);
     }
     footer.signature a{color:#c7d2fe;text-decoration:none;border-bottom:1px dashed rgba(199,210,254,.4)}
     footer.signature a:hover{opacity:.9}
-    /* Buttons ripple (visual apenas) */
     .ripple{position:absolute;border-radius:50%;transform:scale(0);animation:ripple .6s linear;background:rgba(255,255,255,.45)}
     @keyframes ripple{to{transform:scale(4);opacity:0}}
-    /* Animations */
     @keyframes fadeIn{from{opacity:0}to{opacity:1}}
     @keyframes rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
     @keyframes fadeRow{from{opacity:.0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
-    /* Responsive */
     @media(max-width:980px){.grid{grid-template-columns:1fr}}
     @media(max-width:640px){
       .row{grid-template-columns:1fr}
       table{min-width:600px}
-      thead th:nth-child(3), tbody td:nth-child(3){display:none} /* esconde Local no mobile */
-      thead th:nth-child(4), tbody td:nth-child(4){display:none} /* esconde Próx. ação no mobile */
+      thead th:nth-child(3), tbody td:nth-child(3){display:none}
+      thead th:nth-child(4), tbody td:nth-child(4){display:none}
     }
-    /* Motion respect */
     @media (prefers-reduced-motion: reduce){
       *{animation:none !important; transition:none !important}
     }
@@ -318,8 +324,13 @@ $jobs = $list->fetchAll(PDO::FETCH_ASSOC);
 <body>
   <div class="container">
     <header class="hero">
-      <h1>JobTrackr</h1>
-      <p class="sub">Rastreie candidaturas, status e lembretes de follow-up. Exporte CSV e <em>.ics</em> para o seu calendário.</p>
+      <div class="brand">
+        <img class="logo" src="img/jobtrackr.png" alt="JobTrackr logo" onerror="this.style.display='none'">
+        <div>
+          <h1>JobTrackr</h1>
+          <p class="sub">Rastreie candidaturas, status e lembretes de follow-up. Exporte CSV e <em>.ics</em> para o seu calendário.</p>
+        </div>
+      </div>
     </header>
 
     <?php if ($flash): ?>
@@ -445,7 +456,6 @@ $jobs = $list->fetchAll(PDO::FETCH_ASSOC);
                     <td><?= e($j['next_action_date'] ?: '—') ?></td>
                     <td><span class="status-badge <?= e($statusClass) ?>"><?= e($j['status']) ?></span></td>
                     <td>
-                      <!-- Atualizar status rápido -->
                       <form method="post" style="display:inline-block;margin-right:6px">
                         <?= csrf_field() ?>
                         <input type="hidden" name="action" value="update_status">
@@ -456,9 +466,7 @@ $jobs = $list->fetchAll(PDO::FETCH_ASSOC);
                           <?php endforeach; ?>
                         </select>
                       </form>
-                      <!-- Editar (toggle) -->
                       <button class="btn btn-ghost" onclick="toggleEdit(<?= (int)$j['id'] ?>)">Editar</button>
-                      <!-- Remover -->
                       <form method="post" style="display:inline-block" onsubmit="return confirm('Remover esta candidatura?')">
                         <?= csrf_field() ?>
                         <input type="hidden" name="action" value="delete">
@@ -467,7 +475,6 @@ $jobs = $list->fetchAll(PDO::FETCH_ASSOC);
                       </form>
                     </td>
                   </tr>
-                  <!-- Linha edição -->
                   <tr id="edit-<?= (int)$j['id'] ?>" style="display:none">
                     <td colspan="6">
                       <form method="post">
@@ -545,21 +552,18 @@ $jobs = $list->fetchAll(PDO::FETCH_ASSOC);
   </div>
 
   <script>
-    // Alterna linha de edição
     function toggleEdit(id){
       const row = document.getElementById('edit-'+id);
       if (!row) return;
       row.style.display = (row.style.display === 'none' || row.style.display === '') ? 'table-row' : 'none';
       row.scrollIntoView({behavior:'smooth', block:'center'});
     }
-    // Flash auto-dismiss
     (function(){
       const f = document.getElementById('flash');
       if(!f) return;
       setTimeout(()=>{ f.classList.add('hide'); }, 2200);
       setTimeout(()=>{ if (f && f.parentNode) f.parentNode.removeChild(f); }, 2700);
     })();
-    // Efeito ripple nos botões
     document.addEventListener('click', function(e){
       const btn = e.target.closest('.btn');
       if(!btn) return;
