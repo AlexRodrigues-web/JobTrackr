@@ -27,14 +27,10 @@
 
 ## Screenshots / Demo
 
-> Substitua as imagens abaixo por capturas do seu ambiente.
 
 | Nova candidatura | Lista + filtros |
 |---|---|
 | ![Form](docs/form.png) | ![List](docs/list.png) |
-
-Dica: grave um GIF curto (adicionar > filtrar > exportar .ics) e salve como `docs/demo.gif`.  
-Depois, inclua aqui:
 
 
 ## Como executar
